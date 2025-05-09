@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bibliothèque Numérique</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .preview-image {
+            display: none;
+            max-width: 100%;
+            margin-top: 10px;
+        }
+
+        .book-card {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-book-open me-2"></i>Bibliothèque Numérique
+            </a>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3">Bienvenue, <span id="nomUtilisateur"
+                        class="fw-semibold">Utilisateur</span> !</span>
+                <button id="themeToggle" class="btn btn-outline-light me-2" title="Basculer le mode sombre">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="logoutBtn" class="btn btn-outline-light">
+                    <i class="fas fa-sign-out-alt me-1"></i>Déconnexion
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4 flex-grow-1">
+        <!-- Bouton pour ajouter un livre -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Liste des livres</h2>
+            <button class="btn btn-primary" id="addBookBtn" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                <i class="fas fa-plus me-1"></i> Ajouter un livre
+            </button>
+        </div>
+
+        <!-- Recherche et filtres -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-6">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" placeholder="Rechercher un livre..." id="searchInput">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row g-2">
+                    <div class="col-md">
+                        <select class="form-select shadow-sm" id="genreFilter">
+                            <option value="">Tous les genres</option>
+                            <option value="roman">Roman</option>
+                            <option value="science-fiction">Science-Fiction</option>
+                            <option value="fantasy">Fantasy</option>
+                            <option value="biographie">Biographie</option>
+                            <option value="histoire">Histoire</option>
+                        </select>
+                    </div>
+                    <div class="col-md">
+                        <select class="form-select shadow-sm" id="languageFilter">
+                            <option value="">Toutes les langues</option>
+                            <option value="français">Français</option>
+                            <option value="anglais">Anglais</option>
+
+                        </select>
+                    </div>
+                    <div class="col-md">
+                        <select class="form-select shadow-sm" id="sortFilter">
+                            <option value="recent">Plus récent</option>
+                            <option value="ancien">Plus ancien</option>
+                            <option value="titre">Titre (A-Z)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grille des livres -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="booksGrid">
+            <!-- État de chargement -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body text-center loading-spinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Chargement des livres...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Book Modal -->
+    <div class="modal fade" id="addBookModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Ajouter un nouveau livre</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addBookForm">
+                        <div class="mb-3">
+                            <label for="bookTitle" class="form-label">Titre du livre</label>
+                            <input type="text" class="form-control" id="bookTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookAuthor" class="form-label">Auteur</label>
+                            <input type="text" class="form-control" id="bookAuthor" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="bookDescription" rows="3"></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="bookGenre" class="form-label">Genre</label>
+                                <select class="form-select" id="bookGenre">
+                                    <option value="roman">Roman</option>
+                                    <option value="science-fiction">Science-Fiction</option>
+                                    <option value="fantasy">Fantasy</option>
+                                    <option value="biographie">Biographie</option>
+                                    <option value="histoire">Histoire</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="bookLanguage" class="form-label">Langue</label>
+                                <select class="form-select" id="bookLanguage">
+                                    <option value="français">Français</option>
+                                    <option value="anglais">Anglais</option>
+                                    <option value="espagnol">Espagnol</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="bookYear" class="form-label">Année de publication</label>
+                                <input type="number" class="form-control" id="bookYear">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookCover" class="form-label">Couverture du livre (Image)</label>
+                            <input type="file" class="form-control" id="bookCover" accept="image/*">
+                            <small class="text-muted">Téléchargez l'image de couverture</small>
+                            <img id="coverPreview" class="preview-image" alt="Aperçu de la couverture">
+                        </div>
+                        <div class="mb-3">
+                            <label for="bookFile" class="form-label">Fichier du livre (PDF)</label>
+                            <input type="file" class="form-control" id="bookFile" accept=".pdf">
+                            <small class="text-muted">Téléchargez le fichier PDF du livre</small>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" class="btn btn-primary" id="submitBookBtn">
+                        <i class="fas fa-save me-1"></i>Enregistrer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Details Modal -->
+    <div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="modalTitle">Détails du livre</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3 mb-md-0 text-center">
+                            <img src="" class="img-fluid rounded shadow-lg" id="modalCover" alt="Couverture du livre"
+                                style="max-height: 400px;">
+                            <div class="mt-3">
+                                <span class="badge bg-info fs-6" id="modalYear"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h4 id="modalTitleText" class="mb-3"></h4>
+                            <p class="text-muted fst-italic" id="modalAuthor"></p>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span class="badge bg-primary fs-6" id="modalGenre"></span>
+                                <span class="badge bg-secondary fs-6" id="modalLanguage"></span>
+                            </div>
+                            <div class="card bg-light p-3 mb-3" id="modalDescription"></div>
+                            <div class="d-flex align-items-center text-muted mb-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <small>ID: <span id="modalUid"></span></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button class="btn btn-outline-danger like-btn" id="modalLikeBtn">
+                        <i class="far fa-heart me-1"></i>Favori
+                    </button>
+                    <button class="btn btn-primary" id="modalDownloadBtn">
+                        <i class="fas fa-download me-1"></i>Télécharger
+                    </button>
+                    <button class="btn btn-success" id="modalReadBtn">
+                        <i class="fas fa-book-open me-1"></i>Lire
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast align-items-center position-fixed bottom-0 end-0 m-3" id="liveToast" role="alert"
+        aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage"></div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@1.35.6/dist/umd/supabase.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Initialisation Supabase
+        const supabase = window.supabase.createClient(
+            'https://hjcumcmpbiigeeffroav.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqY3VtY21wYmlpZ2VlZmZyb2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2OTk3NTMsImV4cCI6MjA2MjI3NTc1M30.hh0USLgVaNWWMJd_6rpNbBq_D2ZA1cYVBsUwPlK2FY4'
+        );
+
+        // Variables globales
+        let allBooks = [];
+
+        // Gestion de l'utilisateur
+        document.addEventListener("DOMContentLoaded", function () {
+            const utilisateur = JSON.parse(localStorage.getItem("utilisateurConnecte"));
+
+            if (!utilisateur) {
+                alert("Vous devez être connecté pour accéder à cette page.");
+                window.location.href = "connexion.html";
+            } else {
+                document.getElementById("nomUtilisateur").textContent = utilisateur.nom;
+            }
+
+            // Gestion du thème sombre
+            const themeToggle = document.getElementById("themeToggle");
+            const body = document.body;
+            const savedTheme = localStorage.getItem("theme");
+
+            if (savedTheme === "dark") {
+                body.classList.add("bg-dark", "text-white");
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            }
+
+            themeToggle.addEventListener("click", () => {
+                body.classList.toggle("bg-dark");
+                body.classList.toggle("text-white");
+                const isDark = body.classList.contains("bg-dark");
+                localStorage.setItem("theme", isDark ? "dark" : "light");
+                themeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            });
+
+            // Déconnexion
+            document.getElementById("logoutBtn").addEventListener("click", () => {
+                localStorage.clear();
+                window.location.href = "connexion.html";
+            });
+
+            // Charger les livres
+            chargerLivres();
+
+            // Écouteurs pour les filtres et la recherche
+            document.getElementById('searchInput').addEventListener('input', filtrerLivres);
+            document.getElementById('genreFilter').addEventListener('change', filtrerLivres);
+            document.getElementById('languageFilter').addEventListener('change', filtrerLivres);
+            document.getElementById('sortFilter').addEventListener('change', filtrerLivres);
+        });
+
+        // Fonction pour charger les livres
+        async function chargerLivres() {
+            const grid = document.getElementById("booksGrid");
+            grid.innerHTML = `
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-body text-center loading-spinner">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Chargement des livres...</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            try {
+                const { data: livres, error } = await supabase.from('livres').select('*');
+                if (error) throw error;
+
+                allBooks = livres; // Stocker tous les livres pour le filtrage
+
+                if (livres.length === 0) {
+                    grid.innerHTML = '<div class="col"><p class="text-muted">Aucun livre trouvé.</p></div>';
+                    return;
+                }
+
+                afficherLivres(livres);
+            } catch (error) {
+                console.error("Erreur de chargement :", error);
+                grid.innerHTML = '<div class="col"><p class="text-danger">Erreur lors du chargement des livres</p></div>';
+            }
+        }
+
+        // Fonction pour afficher les livres
+        async function afficherLivres(livres) {
+            const grid = document.getElementById("booksGrid");
+            grid.innerHTML = "";
+
+            const utilisateur = JSON.parse(localStorage.getItem("utilisateurConnecte"));
+            if (!utilisateur) return;
+
+            for (const livre of livres) {
+                // Vérifier si le livre est déjà en favori
+                const { data: favori } = await supabase
+                    .from('favoris')
+                    .select('*')
+                    .eq('userid', utilisateur.uid)
+                    .eq('livreid', livre.uid)
+                    .maybeSingle();
+
+                const estFavori = !!favori;
+
+                const card = document.createElement("div");
+                card.className = "col";
+                card.innerHTML = `
+                    <div class="card h-100 shadow-sm book-card" data-uid="${livre.uid}">
+                        <img src="${livre.Cover}" class="card-img-top" alt="${livre.Titre}" style="height: 250px; object-fit: cover;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">${livre.Titre}</h5>
+                            <p class="card-text text-muted">Auteur : ${livre.Auteur}</p>
+                            <div class="mt-auto">
+                                <button class="btn btn-primary btn-sm me-2 read-btn">Lire en ligne</button>
+                            </div>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <button class="btn btn-sm btn-outline-danger like-btn ${estFavori ? 'text-danger' : ''}">
+                                <i class="${estFavori ? 'fas' : 'far'} fa-heart me-1"></i> Favori
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning download-btn">
+                                <i class="fas fa-download me-1"></i> Télécharger
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+
+                // Gestion des événements
+                const cardElement = card.querySelector('.book-card');
+                const readBtn = card.querySelector('.read-btn');
+                const likeBtn = card.querySelector('.like-btn');
+                const downloadBtn = card.querySelector('.download-btn');
+
+                cardElement.addEventListener('click', (e) => {
+                    if (!readBtn.contains(e.target) && !likeBtn.contains(e.target) && !downloadBtn.contains(e.target)) {
+                        afficherDetailsLivre(livre.uid);
+                    }
+                });
+
+                readBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.open(livre.Lien, '_blank');
+                });
+
+                likeBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await toggleFavori(livre.uid, likeBtn);
+                });
+
+                downloadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.open(livre.Lien, '_blank');
+                });
+            }
+        }
+
+        // Fonction pour filtrer et trier les livres
+        function filtrerLivres() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const genreFilter = document.getElementById('genreFilter').value;
+            const languageFilter = document.getElementById('languageFilter').value;
+            const sortFilter = document.getElementById('sortFilter').value;
+
+            let filteredBooks = [...allBooks];
+
+            // Filtre par recherche
+            if (searchTerm) {
+                filteredBooks = filteredBooks.filter(book =>
+                    book.Titre.toLowerCase().includes(searchTerm) ||
+                    book.Auteur.toLowerCase().includes(searchTerm) ||
+                    (book.Description && book.Description.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Filtre par genre
+            if (genreFilter) {
+                filteredBooks = filteredBooks.filter(book => book.Genre === genreFilter);
+            }
+
+            // Filtre par langue
+            if (languageFilter) {
+                filteredBooks = filteredBooks.filter(book => book.Langue === languageFilter);
+            }
+
+            // Tri des livres
+            switch (sortFilter) {
+                case 'recent':
+                    filteredBooks.sort((a, b) => new Date(b.Date) - new Date(a.Date));
+                    break;
+                case 'ancien':
+                    filteredBooks.sort((a, b) => new Date(a.Date) - new Date(b.Date));
+                    break;
+                case 'titre':
+                    filteredBooks.sort((a, b) => a.Titre.localeCompare(b.Titre));
+                    break;
+                default:
+                    break;
+            }
+
+            // Afficher les résultats filtrés
+            if (filteredBooks.length === 0) {
+                document.getElementById("booksGrid").innerHTML = '<div class="col"><p class="text-muted">Aucun livre ne correspond aux critères.</p></div>';
+            } else {
+                afficherLivres(filteredBooks);
+            }
+        }
+
+        // Fonction pour basculer l'état favori
+        async function toggleFavori(livreId, bouton) {
+            const utilisateur = JSON.parse(localStorage.getItem("utilisateurConnecte"));
+            const estFavori = bouton.classList.contains("text-danger");
+            const toast = new bootstrap.Toast(document.getElementById('liveToast'));
+
+            try {
+                if (estFavori) {
+                    // Supprimer le favori
+                    const { error } = await supabase
+                        .from('favoris')
+                        .delete()
+                        .eq('userid', utilisateur.uid)
+                        .eq('livreid', livreId);
+
+                    if (!error) {
+                        bouton.classList.remove("text-danger");
+                        document.getElementById('toastMessage').textContent = "Livre retiré des favoris";
+                        toast.show();
+                    }
+                } else {
+                    // Ajouter le favori
+                    const { error } = await supabase
+                        .from('favoris')
+                        .insert({
+                            userid: utilisateur.uid,
+                            livreid: livreId,
+                            created_at: new Date().toISOString()
+                        });
+
+                    if (!error) {
+                        bouton.classList.add("text-danger");
+                        document.getElementById('toastMessage').textContent = "Livre ajouté aux favoris";
+                        toast.show();
+                    }
+                }
+            } catch (error) {
+                console.error("Erreur favori:", error);
+                document.getElementById('toastMessage').textContent = "Erreur lors de la mise à jour des favoris";
+                toast.show();
+            }
+        }
+
+        // Fonction pour afficher les détails d'un livre
+        async function afficherDetailsLivre(uid) {
+            try {
+                const { data: livre, error } = await supabase
+                    .from('livres')
+                    .select('*')
+                    .eq('uid', uid)
+                    .single();
+
+                if (error) throw error;
+
+                // Remplir la modal
+                document.getElementById('modalTitle').textContent = livre.Titre;
+                document.getElementById('modalTitleText').textContent = livre.Titre;
+                document.getElementById('modalAuthor').textContent = `Auteur: ${livre.Auteur}`;
+                document.getElementById('modalGenre').textContent = livre.Genre;
+                document.getElementById('modalLanguage').textContent = livre.Langue;
+                document.getElementById('modalYear').textContent = `Année: ${livre.Annee}`;
+                document.getElementById('modalDescription').textContent = livre.Description || "Aucune description disponible";
+                document.getElementById('modalCover').src = livre.Cover;
+                document.getElementById('modalUid').textContent = uid;
+
+                // Vérifier si le livre est dans les favoris
+                const utilisateur = JSON.parse(localStorage.getItem("utilisateurConnecte"));
+                const { data: favori } = await supabase
+                    .from('favoris')
+                    .select('*')
+                    .eq('userid', utilisateur.uid)
+                    .eq('livreid', uid)
+                    .maybeSingle();
+
+                const likeBtn = document.getElementById('modalLikeBtn');
+                if (favori) {
+                    likeBtn.classList.add("text-danger");
+                    likeBtn.innerHTML = '<i class="fas fa-heart me-1"></i>Favori';
+                } else {
+                    likeBtn.classList.remove("text-danger");
+                    likeBtn.innerHTML = '<i class="far fa-heart me-1"></i>Favori';
+                }
+
+                // Configurer les boutons
+                document.getElementById('modalDownloadBtn').onclick = () => window.open(livre.Lien, '_blank');
+                document.getElementById('modalReadBtn').onclick = () => window.open(livre.Lien, '_blank');
+                document.getElementById('modalLikeBtn').onclick = async () => {
+                    await toggleFavori(uid, likeBtn);
+                };
+
+                // Afficher la modal
+                new bootstrap.Modal(document.getElementById('bookModal')).show();
+            } catch (error) {
+                console.error("Erreur détails livre:", error);
+                document.getElementById('toastMessage').textContent = "Erreur lors du chargement des détails";
+                new bootstrap.Toast(document.getElementById('liveToast')).show();
+            }
+        }
+
+        // Gestion de l'ajout de livre
+        $(document).ready(function () {
+            $('#bookCover').change(function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        $('#coverPreview').attr('src', event.target.result).show();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            $('#submitBookBtn').click(function () {
+                $('#addBookForm').submit();
+            });
+
+            $('#addBookForm').submit(async function (e) {
+                e.preventDefault();
+
+                const title = $('#bookTitle').val();
+                const annee = $('#bookYear').val();
+                const author = $('#bookAuthor').val();
+                const description = $('#bookDescription').val();
+                const category = $('#bookGenre').val();
+                const coverFile = $('#bookCover')[0].files[0];
+                const bookFile = $('#bookFile')[0].files[0];
+                const langue = $('#bookLanguage').val();
+
+                if (!title || !annee || !langue || !author || !description || !category || !coverFile || !bookFile) {
+                    alert('Veuillez remplir tous les champs');
+                    return;
+                }
+
+                try {
+                    // Upload des fichiers
+                    const timestamp = Date.now();
+                    const cleanCoverName = `${timestamp}_${coverFile.name.replace(/\s+/g, '_')}`;
+                    const cleanBookName = `${timestamp}_${bookFile.name.replace(/\s+/g, '_')}`;
+                    const coverPath = `covers/${cleanCoverName}`;
+                    const bookPath = `books/${cleanBookName}`;
+
+                    // Upload couverture
+                    const { error: coverError } = await supabase.storage.from('livres').upload(coverPath, coverFile);
+                    if (coverError) throw coverError;
+
+                    // Upload livre
+                    const { error: bookError } = await supabase.storage.from('livres').upload(bookPath, bookFile);
+                    if (bookError) throw bookError;
+
+                    // Création des URLs
+                    const BASE_URL = 'https://hjcumcmpbiigeeffroav.supabase.co/storage/v1/object/public/livres';
+                    const coverUrl = `${BASE_URL}/${coverPath}`;
+                    const bookUrl = `${BASE_URL}/${bookPath}`;
+
+                    // Insertion dans la base
+                    const { data, error } = await supabase.from('livres').insert([{
+                        Titre: title,
+                        Annee: annee,
+                        Langue: langue,
+                        Auteur: author,
+                        Description: description,
+                        Genre: category,
+                        Cover: coverUrl,
+                        Lien: bookUrl,
+                        Date: new Date().toISOString(),
+                    }]).select();
+
+                    if (error) throw error;
+
+                    // Réinitialisation et fermeture
+                    $('#addBookForm')[0].reset();
+                    $('#coverPreview').hide();
+                    $('#addBookModal').modal('hide');
+
+                    // Recharger tous les livres
+                    chargerLivres();
+
+                    document.getElementById('toastMessage').textContent = "Livre ajouté avec succès !";
+                    new bootstrap.Toast(document.getElementById('liveToast')).show();
+                } catch (error) {
+                    console.error('Erreur ajout livre:', error);
+                    alert("Erreur lors de l'ajout du livre: " + error.message);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

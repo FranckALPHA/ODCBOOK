@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Bibliothèque Numérique</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --text-color: #333;
+            --light-text: #777;
+            --background-color: #f8f9fa;
+            --card-color: #fff;
+            --border-color: #ddd;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        .dark-mode {
+            --text-color: #f0f0f0;
+            --light-text: #aaa;
+            --background-color: #121212;
+            --card-color: #1e1e1e;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: var(--card-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo i {
+            color: var(--primary-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background-color: var(--card-color);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .auth-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .auth-content {
+            padding: 2rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--card-color);
+            color: var(--text-color);
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--light-text);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-facebook {
+            background-color: #3b5998;
+            color: white;
+            width: 100%;
+        }
+
+        .btn-facebook:hover {
+            background-color: #344e86;
+        }
+
+        .forgot-password {
+            text-align: right;
+        }
+
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--light-text);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .divider::before {
+            margin-right: 1rem;
+        }
+
+        .divider::after {
+            margin-left: 1rem;
+        }
+
+        .social-login {
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--light-text);
+        }
+
+        .auth-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: var(--card-color);
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 480px) {
+            .auth-content {
+                padding: 1.5rem;
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">
+            <i class="fas fa-book-open"></i>
+            <span>Bibliothèque Numérique</span>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Connexion</div>
+                <div class="auth-tab" data-tab="register">Inscription</div>
+            </div>
+
+            <div class="auth-content">
+                <!-- Formulaire de connexion -->
+                <div class="tab-content active" id="login-tab">
+                    <h2>Connectez-vous à votre compte</h2>
+
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="login-email">Email ou numéro de téléphone</label>
+                            <input type="text" id="login-email" class="form-control" required autocomplete="username">
+                        </div>
+
+                        <div class="form-group password-toggle">
+                            <label for="login-password">Mot de passe</label>
+                            <input type="password" id="password" class="form-control" required
+                                autocomplete="current-password">
+                            <span class="toggle-icon" id="toggleLoginPassword">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+
+                        <div class="form-group forgot-password">
+                            <a href="#">Mot de passe oublié ?</a>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Se connecter
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="auth-footer">
+                        Pas encore de compte ? <a href="#" id="switchToRegister">S'inscrire</a>
+                    </div>
+                </div>
+
+                <!-- Formulaire d'inscription -->
+                <div class="tab-content" id="register-tab">
+                    <h2>Créez votre compte</h2>
+
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="register-name">Nom complet</label>
+                            <input type="text" id="register-name" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-phone">Numéro de téléphone</label>
+                            <input type="tel" id="register-phone" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="register-email">Adresse email</label>
+                            <input type="email" id="register-email" class="form-control" required
+                                autocomplete="username">
+                        </div>
+
+                        <div class="form-group password-toggle">
+                            <label for="register-password">Mot de passe</label>
+                            <input type="password" id="register-password" class="form-control" required minlength="8"
+                                autocomplete="new-password">
+                            <span class="toggle-icon" id="toggleRegisterPassword">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+
+                        <div class="form-group password-toggle">
+                            <label for="register-confirm-password">Confirmez le mot de passe</label>
+                            <input type="password" id="register-confirm-password" class="form-control" required
+                                minlength="8" autocomplete="new-password">
+                            <span class="toggle-icon" id="toggleRegisterConfirmPassword">
+                                <i class="far fa-eye"></i>
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> S'inscrire
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="auth-footer">
+                        Déjà un compte ? <a href="#" id="switchToLogin">Se connecter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2023 Bibliothèque Numérique. Tous droits réservés.</p>
+    </footer>
+    <script>
+        // Gestion des onglets
+        const tabs = document.querySelectorAll('.auth-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+
+                // Mettre à jour les onglets
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Mettre à jour le contenu
+                tabContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Fonction pour basculer la visibilité du mot de passe
+        function setupPasswordToggle(toggleId, inputId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+            const icon = toggle.querySelector('i');
+
+            toggle.addEventListener('click', () => {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                icon.classList.toggle('fa-eye-slash', isPassword);
+                icon.classList.toggle('fa-eye', !isPassword);
+            });
+        }
+
+        // Initialiser les toggles de mot de passe
+        setupPasswordToggle('toggleLoginPassword', 'login-password');
+        setupPasswordToggle('toggleRegisterPassword', 'register-password');
+        setupPasswordToggle('toggleRegisterConfirmPassword', 'register-confirm-password');
+
+        // Gestion du mode sombre/clair
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+
+            // Vérifier le mode au chargement
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                icon.classList.replace('fa-moon', 'fa-sun');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+
+                icon.classList.toggle('fa-moon', !isDarkMode);
+                icon.classList.toggle('fa-sun', isDarkMode);
+
+                // Sauvegarder la préférence
+                localStorage.setItem('darkMode', isDarkMode);
+            });
+        }
+
+        // Liens de basculement entre connexion/inscription
+        document.getElementById('switchToRegister').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('[data-tab="register"]').click();
+        });
+
+        document.getElementById('switchToLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.querySelector('[data-tab="login"]').click();
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://hjcumcmpbiigeeffroav.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhqY3VtY21wYmlpZ2VlZmZyb2F2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2OTk3NTMsImV4cCI6MjA2MjI3NTc1M30.hh0USLgVaNWWMJd_6rpNbBq_D2ZA1cYVBsUwPlK2FY4'
+        );
+
+        async function verifierConnexion(email, motdepasse) {
+            const { data, error } = await supabase
+                .from('Utilisateurs')
+                .select('*')
+                .eq('Email', email)
+                .single();
+
+            if (error || !data) {
+                return { success: false, message: "Utilisateur introuvable" };
+            }
+
+            if (data.Pass === motdepasse) {
+                // Connexion réussie → stocker en session
+                localStorage.setItem("utilisateurConnecte", JSON.stringify({
+                    uid: data.uid,
+                    nom: data.Nom,
+                    email: data.Email
+                }));
+                return { success: true };
+            } else {
+                return { success: false, message: "Mot de passe incorrect" };
+            }
+        }
+
+
+        document.getElementById("registerForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            // Récupération des valeurs
+            const nom = document.getElementById("register-name").value.trim();
+            const telephone = document.getElementById("register-phone").value.trim();
+            const email = document.getElementById("register-email").value.trim().toLowerCase();
+            const password = document.getElementById("register-password").value;
+            const confirmPassword = document.getElementById("register-confirm-password").value;
+
+            // Validation
+            if (!nom || !telephone || !email || !password) {
+                alert("Tous les champs sont obligatoires !");
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert("Les mots de passe ne correspondent pas !");
+                return;
+            }
+
+            if (password.length < 8) {
+                alert("Le mot de passe doit contenir au moins 8 caractères");
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert("Veuillez entrer une adresse email valide");
+                return;
+            }
+
+            const phoneRegex = /^[0-9]{9,15}$/;
+            if (!phoneRegex.test(telephone)) {
+                alert("Veuillez entrer un numéro de téléphone valide");
+                return;
+            }
+
+            try {
+                // Vérifier si l'email ou le téléphone existe déjà dans Supabase
+                const { data: existingUsers, error } = await supabase
+                    .from('Utilisateurs')
+                    .select('*')
+                    .or(`Email.eq.${email},Tel.eq.${telephone}`);
+
+                if (error) throw error;
+
+                if (existingUsers.length > 0) {
+                    if (existingUsers.some(user => user.email === email)) {
+                        alert("Cet email est déjà utilisé !");
+                        return;
+                    }
+                    if (existingUsers.some(user => user.telephone === telephone)) {
+                        alert("Ce numéro de téléphone est déjà utilisé !");
+                        return;
+                    }
+                }
+
+                // Ajouter l'utilisateur
+                const { error: insertError } = await supabase
+                    .from('Utilisateurs')
+                    .insert([{
+                        Nom: nom,
+                        Tel: telephone,
+                        Email: email,
+                        Pass: password,
+                        created_at: new Date().toISOString()
+                    }]);
+
+                if (insertError) throw insertError;
+
+                alert("Inscription réussie !");
+                document.getElementById("registerForm").reset();
+                document.querySelector('[data-tab="login"]').click(); // Aller à l'onglet login
+
+            } catch (err) {
+                console.error("Erreur d'inscription:", err);
+                alert("Une erreur est survenue. Veuillez réessayer.");
+            }
+        });
+
+
+        // Formulaire de connexion
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const motdepasse = document.getElementById('password').value;
+
+            const result = await verifierConnexion(email, motdepasse);
+
+            if (result.success) {
+                window.location.href = "Livre.html";
+            } else {
+                alert(result.message);
+            }
+        });
+    </script>
+</body>
+
+</html>
